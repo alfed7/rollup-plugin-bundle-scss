@@ -1,6 +1,8 @@
 import path from 'path';
 import postcss from 'rollup-plugin-postcss';
 import bundleScss from '../../../index.js';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default {
   input: path.resolve(__dirname, 'index.js'),

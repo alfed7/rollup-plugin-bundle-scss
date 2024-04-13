@@ -1,5 +1,8 @@
 import path from 'path';
 import bundleScss from '../../../index.js';
+import autoprefixer from 'autoprefixer';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default {
   input: path.resolve(__dirname, 'index.js'),
@@ -8,6 +11,16 @@ export default {
     format: 'esm',
   },
   plugins: [
-    bundleScss(),
+    bundleScss({bundlerOptions: {
+      plugins: [
+        autoprefixer(),
+      ],
+      use: [
+        ['sass', {
+          data: "@import './variables.scss'; ",
+          includePaths: [path.join(__dirname, '.')]
+        }]
+      ],
+    }}),
   ],
 };

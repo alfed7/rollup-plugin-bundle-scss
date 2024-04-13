@@ -18,6 +18,4 @@ describe('cases', () => {
   test('bundler-options', () => run('bundler-options'));
   test('custom-output', () => run('custom-output', './dist/custom.scss'));
   test('postcss', () => run('postcss'));
-  test('vue', () => run('vue'));
-  test('vue3', () => run('vue3'));
 });

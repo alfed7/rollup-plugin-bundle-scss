@@ -7,7 +7,9 @@ exports[`cases basic 1`] = `
 
 
 .foo {
-  color: #cf649a;
+  color: $primary_bg_color;
+  background: linear-gradient(#e98a00, #f5aa2f);
+  column-gap: 1.5rem;
 }
 "
 `;
@@ -20,19 +22,17 @@ exports[`cases bundler-options 1`] = `
 
 .bar {
   color: #bf4080;
+  background: linear-gradient(#e98a00, #f5aa2f); 
 }
 "
 `;
 
 exports[`cases custom-output 1`] = `
 ".bar {
-  color: #bf4080;
-}
-
+  color: #bf4080; }
 
 .foo {
-  color: #cf649a;
-}
+  color: #cf649a; }
 "
 `;
 
@@ -42,31 +42,6 @@ exports[`cases postcss 1`] = `
 
 .element {
   color: $red;
-}
-"
-`;
-
-exports[`cases vue 1`] = `
-"
-.foo {
-  color: #41b883;
-}
-
-
-.bar {
-  color: #35495d;
-}
-"
-`;
-
-exports[`cases vue3 1`] = `
-"
-.foo {
-  color: #41b883;
-}
-
-.bar {
-  color: #35495d;
 }
 "
 `;

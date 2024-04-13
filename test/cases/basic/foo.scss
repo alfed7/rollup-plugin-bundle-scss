@@ -1,5 +1,7 @@
 @import "./bar.scss";
 
 .foo {
-  color: #cf649a;
+  color: $primary_bg_color;
+  background: linear-gradient(#e98a00, #f5aa2f);
+  column-gap: 1.5rem;
 }
