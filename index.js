@@ -18,7 +18,7 @@ export default function bundleScss({ output, exclusive = true, bundlerOptions = 
   return {
     name: 'bundle-scss',
     transform(source, id) {
-      if (/\.scss$/.test(id)) {
+      if (/\.s?css$/.test(id)) {
         files.push({ id, content: source });
         if (exclusive) {
           return { code: `export default ${JSON.stringify(source)}` };
