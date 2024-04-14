@@ -1,10 +1,9 @@
 {
   "name": "rollup-plugin-bundle-scss-postcss",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "description": "Rollup .scss imports into one bundled .scss file. Also supports PostCSS.",
   "main": "dist/index.js",
   "module": "index.js",
-  "type": "module",
   "files": [
     "dist",
     "index.js"

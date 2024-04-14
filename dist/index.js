@@ -3,35 +3,20 @@
 var fs = require('fs');
 var path = require('path');
 var scssBundle = require('scss-bundle');
+var postcss = require('postcss');
+var sass = require('node-sass');
 
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-function _interopNamespace(e) {
-  if (e && e.__esModule) return e;
-  var n = Object.create(null);
-  if (e) {
-    Object.keys(e).forEach(function (k) {
-      if (k !== 'default') {
-        var d = Object.getOwnPropertyDescriptor(e, k);
-        Object.defineProperty(n, k, d.get ? d : {
-          enumerable: true,
-          get: function () {
-            return e[k];
-          }
-        });
+function renderSass(options) {
+  return new Promise((resolve, reject) => {
+    sass.render(options, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result.css.toString());
       }
     });
-  }
-  n['default'] = e;
-  return Object.freeze(n);
+  });
 }
-
-var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
-
-let compiler = null;
-Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require('vue-template-compiler')); })
-  .then((module) => { compiler = module; })
-  .catch(() => {});
 
 function bundleScss({ output, exclusive = true, bundlerOptions = {} } = {}) {
   const files = [];
@@ -40,6 +25,8 @@ function bundleScss({ output, exclusive = true, bundlerOptions = {} } = {}) {
     dedupeGlobs = [],
     includePaths = [],
     ignoreImports = [],
+    plugins = [],
+    use = [],
   } = bundlerOptions;
   return {
     name: 'bundle-scss',
@@ -50,31 +37,41 @@ function bundleScss({ output, exclusive = true, bundlerOptions = {} } = {}) {
           return { code: `export default ${JSON.stringify(source)}` };
         }
       }
-      if (/\.vue$/.test(id) && compiler) {
-        const { styles } = compiler.parseComponent(source);
-        files.push(
-          ...styles
-            .filter((style) => style.lang === 'scss')
-            .map((style, index) => ({
-              id: `${id}.${index}.scss`,
-              content: style.content,
-            })),
-        );
-      }
       return null;
     },
     async generateBundle(opts) {
-      const outputPath = path__default['default'].resolve(
-        opts.file ? path__default['default'].dirname(opts.file) : opts.dir,
-        output || `${opts.file ? path__default['default'].parse(opts.file).name : 'index'}.scss`,
+      const outputPath = path.resolve(
+        opts.file ? path.dirname(opts.file) : opts.dir,
+        output || `${opts.file ? path.parse(opts.file).name : 'index'}.scss`,
       );
-      await fs.promises.mkdir(path__default['default'].dirname(outputPath), { recursive: true });
+      await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
       const entryContent = files.map((file) => `@import "${file.id}";`).join('\n');
       await fs.promises.writeFile(outputPath, entryContent);
       const registry = Object.assign({}, ...files.map((file) => ({ [file.id]: file.content })));
       const bundler = new scssBundle.Bundler(registry, project);
       const result = await bundler.bundle(outputPath, dedupeGlobs, includePaths, ignoreImports);
       await fs.promises.writeFile(outputPath, result.bundledContent);
+
+      const sassBlock = use.find((u) => u[0] === 'sass');
+      if (sassBlock) {
+        const sassOptions = (sassBlock && sassBlock.length > 1) ? sassBlock[1] : {};
+
+        const d = sassOptions.data ? sassOptions.data : '';
+        const css = await renderSass({ ...sassOptions, data: d + result.bundledContent });
+
+        const r = await postcss(plugins)
+          .process(css);
+
+        const outputPath2 = path.resolve(
+          opts.file ? path.dirname(opts.file) : opts.dir,
+          output || `${opts.file ? path.parse(opts.file).name : 'index'}.css`,
+        );
+        await fs.promises.writeFile(outputPath2, r.css);
+        // if (r.map) {
+        //   fs.writeFile('dest/app.css.map', r.map.toString(), () => true);
+        // }
+        // , { from: 'src/app.css', to: 'dest/app.css' });
+      }
     },
   };
 }

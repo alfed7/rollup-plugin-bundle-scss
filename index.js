@@ -29,7 +29,7 @@ export default function bundleScss({ output, exclusive = true, bundlerOptions = 
   return {
     name: 'bundle-scss',
     transform(source, id) {
-      if (/\.scss$/.test(id)) {
+      if (/\.s?css$/.test(id)) {
         files.push({ id, content: source });
         if (exclusive) {
           return { code: `export default ${JSON.stringify(source)}` };
@@ -51,23 +51,25 @@ export default function bundleScss({ output, exclusive = true, bundlerOptions = 
       await fs.writeFile(outputPath, result.bundledContent);
 
       const sassBlock = use.find((u) => u[0] === 'sass');
-      const sassOptions = (sassBlock && sassBlock.length > 1) ? sassBlock[1] : {};
+      if (sassBlock) {
+        const sassOptions = (sassBlock && sassBlock.length > 1) ? sassBlock[1] : {};
 
-      const d = sassOptions.data ? sassOptions.data : '';
-      const css = await renderSass({ ...sassOptions, data: d + result.bundledContent });
+        const d = sassOptions.data ? sassOptions.data : '';
+        const css = await renderSass({ ...sassOptions, data: d + result.bundledContent });
 
-      const r = await postcss(plugins)
-        .process(css);
+        const r = await postcss(plugins)
+          .process(css);
 
-      const outputPath2 = path.resolve(
-        opts.file ? path.dirname(opts.file) : opts.dir,
-        output || `${opts.file ? path.parse(opts.file).name : 'index'}.css`,
-      );
-      await fs.writeFile(outputPath2, r.css);
-      // if (r.map) {
-      //   fs.writeFile('dest/app.css.map', r.map.toString(), () => true);
-      // }
-      // , { from: 'src/app.css', to: 'dest/app.css' });
+        const outputPath2 = path.resolve(
+          opts.file ? path.dirname(opts.file) : opts.dir,
+          output || `${opts.file ? path.parse(opts.file).name : 'index'}.css`,
+        );
+        await fs.writeFile(outputPath2, r.css);
+        // if (r.map) {
+        //   fs.writeFile('dest/app.css.map', r.map.toString(), () => true);
+        // }
+        // , { from: 'src/app.css', to: 'dest/app.css' });
+      }
     },
   };
 }

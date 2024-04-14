@@ -8,7 +8,7 @@ function resolve(...args) {
 }
 
 async function run(name, output = './dist/index.scss') {
-  await exec(`rollup -c=${resolve('cases', name, 'rollup.config.js')}`);
+  await exec(`rollup -c=${resolve('cases', name, 'rollup.config.mjs')}`);
   const scss = await fs.readFile(resolve('cases', name, output), 'utf-8');
   expect(scss).toMatchSnapshot();
 }

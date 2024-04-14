@@ -11,7 +11,10 @@ exports[`cases basic 1`] = `
   background: linear-gradient(#e98a00, #f5aa2f);
   column-gap: 1.5rem;
 }
-"
+
+body {
+  background-color: aqua;
+}"
 `;
 
 exports[`cases bundler-options 1`] = `
@@ -29,10 +32,13 @@ exports[`cases bundler-options 1`] = `
 
 exports[`cases custom-output 1`] = `
 ".bar {
-  color: #bf4080; }
+  color: #bf4080;
+}
+
 
 .foo {
-  color: #cf649a; }
+  color: #cf649a;
+}
 "
 `;
 
